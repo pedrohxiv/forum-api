@@ -8,9 +8,7 @@ import { UpdateQuestionDto } from 'src/questions/dto/update-question.dto';
 export class QuestionsService {
   constructor(private readonly prisma: PrismaService) {}
 
-  create(createQuestionDto: CreateQuestionDto) {
-    const userId = 1;
-
+  create(createQuestionDto: CreateQuestionDto, userId: number) {
     return this.prisma.questions.create({
       data: { ...createQuestionDto, userId },
     });

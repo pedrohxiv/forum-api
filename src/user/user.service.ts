@@ -12,32 +12,32 @@ export class UserService {
   async create(createUserDto: CreateUserDto) {
     const hashPassword = await bcrypt.hash(createUserDto.password, 10);
 
-    return this.prisma.user.create({
+    return this.prisma.users.create({
       data: { ...createUserDto, password: hashPassword },
     });
   }
 
   findAll() {
-    return this.prisma.user.findMany();
+    return this.prisma.users.findMany();
   }
 
   findById(id: number) {
-    return this.prisma.user.findUnique({ where: { id } });
+    return this.prisma.users.findUnique({ where: { id } });
   }
 
   findByEmail(email: string) {
-    return this.prisma.user.findUnique({ where: { email } });
+    return this.prisma.users.findUnique({ where: { email } });
   }
 
   update(id: number, updateUserDto: UpdateUserDto) {
-    return this.prisma.user.update({
+    return this.prisma.users.update({
       where: { id },
       data: updateUserDto,
     });
   }
 
   remove(id: number) {
-    return this.prisma.user.delete({
+    return this.prisma.users.delete({
       where: { id },
     });
   }

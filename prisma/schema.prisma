@@ -7,7 +7,7 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model User {
+model Users {
   id        Int         @id @default(autoincrement())
   email     String      @unique
   name      String?
@@ -25,7 +25,7 @@ model Questions {
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
   userId    Int
-  user      User      @relation(fields: [userId], references: [id])
+  user      Users     @relation(fields: [userId], references: [id])
   answers   Answers[]
 }
 
@@ -36,6 +36,6 @@ model Answers {
   updatedAt  DateTime  @updatedAt
   userId     Int
   questionId Int
-  user       User      @relation(fields: [userId], references: [id])
+  user       Users     @relation(fields: [userId], references: [id])
   question   Questions @relation(fields: [questionId], references: [id])
 }

@@ -6,6 +6,7 @@ import {
   Param,
   Patch,
   Post,
+  Request,
   UseGuards,
 } from '@nestjs/common';
 
@@ -20,8 +21,8 @@ export class QuestionsController {
 
   @UseGuards(AuthGuard)
   @Post()
-  create(@Body() createQuestionDto: CreateQuestionDto) {
-    return this.questionsService.create(createQuestionDto);
+  create(@Body() createQuestionDto: CreateQuestionDto, @Request() req: any) {
+    return this.questionsService.create(createQuestionDto, req.sub.sub);
   }
 
   @UseGuards(AuthGuard)
