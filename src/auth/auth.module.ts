@@ -4,10 +4,12 @@ import { JwtModule } from '@nestjs/jwt';
 import { AuthController } from 'src/auth/auth.controller';
 import { AuthGuard } from 'src/auth/auth.guard';
 import { AuthService } from 'src/auth/auth.service';
+import { DatabaseModule } from 'src/database/database.module';
 import { UserModule } from 'src/user/user.module';
 
 @Module({
   imports: [
+    DatabaseModule,
     forwardRef(() => UserModule),
     JwtModule.register({
       global: true,

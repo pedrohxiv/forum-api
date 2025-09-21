@@ -7,17 +7,19 @@ import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 
 import { SigninDto } from 'src/auth/dto/signin.dto';
-import { UserService } from 'src/user/user.service';
+import { PrismaService } from 'src/database/prisma.service';
 
 @Injectable()
 export class AuthService {
   constructor(
-    private readonly userService: UserService,
+    private readonly prisma: PrismaService,
     private readonly jwtService: JwtService,
   ) {}
 
   async signin(signinDto: SigninDto) {
-    const user = await this.userService.findByEmail(signinDto.email);
+    const user = await this.prisma.users.findUnique({
+      where: { email: signinDto.email },
+    });
 
     if (!user) {
       throw new NotFoundException('User not found');

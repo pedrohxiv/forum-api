@@ -15,11 +15,14 @@ export class QuestionsService {
   }
 
   findAll() {
-    return this.prisma.questions.findMany();
+    return this.prisma.questions.findMany({ include: { answers: true } });
   }
 
   findOne(id: number) {
-    return this.prisma.questions.findUnique({ where: { id } });
+    return this.prisma.questions.findUnique({
+      where: { id },
+      include: { answers: true, user: { select: { name: true, email: true } } },
+    });
   }
 
   update(id: number, updateQuestionDto: UpdateQuestionDto) {
