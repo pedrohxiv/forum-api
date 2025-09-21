@@ -1,33 +1,32 @@
 import {
-  Inject,
   Injectable,
   NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { Prisma } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
 
+import { SigninDto } from 'src/auth/dto/signin.dto';
 import { UserService } from 'src/user/user.service';
 
 @Injectable()
 export class AuthService {
-  @Inject()
-  private readonly userService: UserService;
+  constructor(
+    private readonly userService: UserService,
+    private readonly jwtService: JwtService,
+  ) {}
 
-  @Inject()
-  private readonly jwtService: JwtService;
-
-  async signin(
-    params: Prisma.UserCreateInput,
-  ): Promise<{ access_token: string }> {
-    const user = await this.userService.getUser({ email: params.email });
+  async signin(signinDto: SigninDto) {
+    const user = await this.userService.findByEmail(signinDto.email);
 
     if (!user) {
       throw new NotFoundException('User not found');
     }
 
-    const passwordMatch = await bcrypt.compare(params.password, user.password);
+    const passwordMatch = await bcrypt.compare(
+      signinDto.password,
+      user.password,
+    );
 
     if (!passwordMatch) {
       throw new UnauthorizedException('Invalid credentials');

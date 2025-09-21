@@ -1,4 +1,4 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 
 import { PrismaService } from 'src/database/prisma.service';
 import { CreateQuestionDto } from 'src/questions/dto/create-question.dto';
@@ -6,8 +6,7 @@ import { UpdateQuestionDto } from 'src/questions/dto/update-question.dto';
 
 @Injectable()
 export class QuestionsService {
-  @Inject()
-  private readonly prisma: PrismaService;
+  constructor(private readonly prisma: PrismaService) {}
 
   create(createQuestionDto: CreateQuestionDto) {
     const userId = 1;

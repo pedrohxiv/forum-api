@@ -3,50 +3,47 @@ import {
   Controller,
   Delete,
   Get,
-  Inject,
   Param,
   Patch,
   Post,
   UseGuards,
 } from '@nestjs/common';
-import { Prisma, User as UserModel } from '@prisma/client';
 
 import { AuthGuard } from 'src/auth/auth.guard';
+import { CreateUserDto } from 'src/user/dto/create-user.dto';
+import { UpdateUserDto } from 'src/user/dto/update-user.dto';
 import { UserService } from 'src/user/user.service';
 
-@Controller('user')
+@Controller('users')
 export class UserController {
-  @Inject()
-  private readonly userService: UserService;
+  constructor(private readonly userService: UserService) {}
 
   @Post()
-  async signupUser(
-    @Body() userData: Prisma.UserCreateInput,
-  ): Promise<UserModel> {
-    return this.userService.createUser(userData);
+  create(@Body() createUserDto: CreateUserDto) {
+    return this.userService.create(createUserDto);
+  }
+
+  @UseGuards(AuthGuard)
+  @Get()
+  findAll() {
+    return this.userService.findAll();
   }
 
   @UseGuards(AuthGuard)
   @Get(':id')
-  async getUser(@Param('id') id: string): Promise<UserModel | null> {
-    return this.userService.getUser({ id: Number(id) });
+  findById(@Param('id') id: string) {
+    return this.userService.findById(+id);
   }
 
   @UseGuards(AuthGuard)
   @Patch(':id')
-  async updateUser(
-    @Body() userData: Prisma.UserUpdateInput,
-    @Param('id') id: string,
-  ): Promise<UserModel> {
-    return this.userService.updateUser({
-      where: { id: Number(id) },
-      data: userData,
-    });
+  update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
+    return this.userService.update(+id, updateUserDto);
   }
 
   @UseGuards(AuthGuard)
   @Delete(':id')
-  async deleteUser(@Param('id') id: string): Promise<UserModel> {
-    return this.userService.deleteUser({ id: Number(id) });
+  remove(@Param('id') id: string) {
+    return this.userService.remove(+id);
   }
 }
