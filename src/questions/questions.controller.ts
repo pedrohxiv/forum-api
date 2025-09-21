@@ -4,10 +4,12 @@ import {
   Delete,
   Get,
   Param,
+  ParseIntPipe,
   Patch,
   Post,
   Request,
   UseGuards,
+  ValidationPipe,
 } from '@nestjs/common';
 
 import { AuthGuard } from 'src/auth/auth.guard';
@@ -21,7 +23,10 @@ export class QuestionsController {
 
   @UseGuards(AuthGuard)
   @Post()
-  create(@Body() createQuestionDto: CreateQuestionDto, @Request() req: any) {
+  create(
+    @Body(new ValidationPipe()) createQuestionDto: CreateQuestionDto,
+    @Request() req: any,
+  ) {
     return this.questionsService.create(createQuestionDto, req.sub.sub);
   }
 
@@ -33,22 +38,22 @@ export class QuestionsController {
 
   @UseGuards(AuthGuard)
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.questionsService.findOne(+id);
+  findOne(@Param('id', ParseIntPipe) id: number) {
+    return this.questionsService.findOne(id);
   }
 
   @UseGuards(AuthGuard)
   @Patch(':id')
   update(
-    @Param('id') id: string,
-    @Body() updateQuestionDto: UpdateQuestionDto,
+    @Param('id', ParseIntPipe) id: number,
+    @Body(new ValidationPipe()) updateQuestionDto: UpdateQuestionDto,
   ) {
-    return this.questionsService.update(+id, updateQuestionDto);
+    return this.questionsService.update(id, updateQuestionDto);
   }
 
   @UseGuards(AuthGuard)
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.questionsService.remove(+id);
+  remove(@Param('id', ParseIntPipe) id: number) {
+    return this.questionsService.remove(id);
   }
 }
