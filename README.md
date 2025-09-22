@@ -1,98 +1,203 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# Forum API
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+## Descrição do Projeto
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+A **Forum API** é uma aplicação backend desenvolvida com **NestJS**, criada com o objetivo de aprender este framework poderoso e modular. O projeto simula a estrutura de um fórum online, permitindo que usuários criem contas, publiquem perguntas e respondam interações dentro da comunidade.
 
-## Description
+Durante o desenvolvimento foram implementados conceitos essenciais como arquitetura em camadas, autenticação e autorização, além do uso de ORM com **Prisma** para manipulação de dados.
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+A aplicação também conta com boas práticas como encriptação de senhas com **bcrypt**, criação e validação de tokens JWT, além do uso de **Guards** e **Pipes** nativos do NestJS para validação e segurança.
 
-## Project setup
+## Principais Funcionalidades
 
-```bash
-$ npm install
+- **CRUD de Usuários (Users):**
+  - Criação de contas com senha encriptada.
+  - Login seguro com JWT.
+  - Atualização e exclusão de perfis.
+
+- **CRUD de Perguntas (Questions):**
+  - Usuários autenticados podem criar perguntas.
+  - Atualização e remoção das próprias perguntas.
+  - Relacionamento direto com o autor da pergunta.
+
+- **CRUD de Respostas (Answers):**
+  - Usuários autenticados podem responder perguntas.
+  - Atualização e remoção das próprias respostas.
+  - Associação direta entre pergunta e resposta.
+
+- **Autenticação Segura:**
+  - Registro com validação.
+  - Login com JWT.
+  - Proteção de rotas com **AuthGuard**.
+  - Uso de **bcrypt** para hashing de senhas.
+
+- **Validações com Pipes do NestJS:**
+  - Garantia de entrada de dados segura e padronizada.
+  - Tratamento de erros para respostas consistentes.
+
+## Modelagem de Dados
+
+A modelagem foi feita com **Prisma ORM** utilizando **SQLite** como banco de dados.
+
+```prisma
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Users {
+  id        Int         @id @default(autoincrement())
+  email     String      @unique
+  name      String?
+  password  String
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+  questions Questions[]
+  answers   Answers[]
+}
+
+model Questions {
+  id        Int       @id @default(autoincrement())
+  title     String
+  body      String
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  userId    Int
+  user      Users     @relation(fields: [userId], references: [id])
+  answers   Answers[]
+}
+
+model Answers {
+  id         Int       @id @default(autoincrement())
+  body       String
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+  userId     Int
+  questionId Int
+  user       Users     @relation(fields: [userId], references: [id])
+  question   Questions @relation(fields: [questionId], references: [id])
+}
 ```
 
-## Compile and run the project
+## Dependências
+
+O projeto utiliza as seguintes dependências principais:
+
+- `@nestjs/common`: ^11.0.1,
+- `@nestjs/core`: ^11.0.1,
+- `@nestjs/jwt`: ^11.0.0,
+- `@nestjs/mapped-types`: \*,
+- `@nestjs/platform-express`: ^11.0.1,
+- `@prisma/client`: ^6.16.2,
+- `bcrypt`: ^6.0.0,
+- `class-transformer`: ^0.5.1,
+- `class-validator`: ^0.14.2,
+- `reflect-metadata`: ^0.2.2,
+- `rxjs`: ^7.8.1,
+- `@eslint/eslintrc`: ^3.2.0,
+- `@eslint/js`: ^9.18.0,
+- `@nestjs/cli`: ^11.0.0,
+- `@nestjs/schematics`: ^11.0.0,
+- `@nestjs/testing`: ^11.0.1,
+- `@types/bcrypt`: ^6.0.0,
+- `@types/express`: ^5.0.0,
+- `@types/jest`: ^30.0.0,
+- `@types/node`: ^22.10.7,
+- `@types/supertest`: ^6.0.2,
+- `eslint`: ^9.18.0,
+- `eslint-config-prettier`: ^10.0.1,
+- `eslint-plugin-prettier`: ^5.2.2,
+- `globals`: ^16.0.0,
+- `jest`: ^30.0.0,
+- `prettier`: ^3.4.2,
+- `prisma`: ^6.16.2,
+- `source-map-support`: ^0.5.21,
+- `supertest`: ^7.0.0,
+- `ts-jest`: ^29.2.5,
+- `ts-loader`: ^9.5.2,
+- `ts-node`: ^10.9.2,
+- `tsconfig-paths`: ^4.2.0,
+- `typescript`: ^5.7.3,
+- `typescript-eslint`: ^8.20.0,
+
+## Como Executar o Projeto
+
+1. Clone este repositório:
 
 ```bash
-# development
-$ npm run start
-
-# watch mode
-$ npm run start:dev
-
-# production mode
-$ npm run start:prod
+git clone https://github.com/pedrohxiv/forum-api.git
+cd forum-api
 ```
 
-## Run tests
+2. Instale as dependências:
 
 ```bash
-# unit tests
-$ npm run test
-
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
+npm install
+# ou
+yarn install
 ```
 
-## Deployment
+3. Configure as variáveis de ambiente no arquivo `.env`:
 
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
+```env
+DATABASE_URL="file:./dev.db"
+SECRET_KEY="sua_chave_secreta_aqui"
+```
 
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+4. Rode as migrações do Prisma para criar o banco de dados:
 
 ```bash
-$ npm install -g @nestjs/mau
-$ mau deploy
+npx prisma migrate dev --name init
 ```
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+5. Inicie o servidor de desenvolvimento:
 
-## Resources
+```bash
+npm run start:dev
+```
 
-Check out a few resources that may come in handy when working with NestJS:
+6. Acesse a API em:
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+```
+http://localhost:3000
+```
 
-## Support
+## Rotas Principais
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+- **Users**
+  - `POST /users` → Criação de usuário.
+  - `POST /auth/signin` → Login e geração de token JWT.
+  - `GET /users` → Lista todos os usuários.
+  - `GET /users/:id` → Retorna informações do usuário.
+  - `PATCH /users/:id` → Atualiza informações do usuário.
+  - `DELETE /users/:id` → Remove usuário.
 
-## Stay in touch
+- **Questions**
+  - `POST /questions` → Criação de pergunta.
+  - `GET /questions` → Lista todas as perguntas.
+  - `GET /questions/:id` → Detalhes de uma pergunta específica.
+  - `PATCH /questions/:id` → Atualiza uma pergunta.
+  - `DELETE /questions/:id` → Remove uma pergunta.
 
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+- **Answers**
+  - `POST /answers/:questionId` → Criação de resposta.
+  - `GET /answers` → Lista todas as respostas.
+  - `GET /answers/:id` → Detalhes de uma resposta específica.
+  - `PATCH /answers/:id` → Atualiza uma resposta.
+  - `DELETE /answers/:id` → Remove uma resposta.
 
-## License
+## Aprendizados
 
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+Este projeto foi desenvolvido como forma de aprendizado do **NestJS** e das boas práticas no desenvolvimento de APIs modernas.
+Entre os principais pontos aprendidos estão:
+
+- Estrutura modular do NestJS.
+- Implementação de autenticação JWT.
+- Uso de Guards, Pipes e Decorators nativos.
+- Integração do Prisma ORM com SQLite.
+- Implementação de CRUD completo e relacionamentos entre entidades.
+- Encriptação de senhas e boas práticas de segurança.
